@@ -38,7 +38,7 @@ class SatsVB:
     P2WPKH_IN_SIZE = 67.75
     P2WPKH_OUT_SIZE = 31
     P2WSH_OUT_SIZE = P2TR_OUT_SIZE = 43
-    P2TR_IN_SIZE = 57.25
+    P2TR_IN_SIZE = 57.50  # Unified Schnorr signatures include the 0x21 byte.
 
     PUBKEY_SIZE = 33
     SIGNATURE_SIZE = 72

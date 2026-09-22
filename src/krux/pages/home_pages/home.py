@@ -514,6 +514,13 @@ class Home(Page):
         from ...psbt import PSBTSigner
 
         signer = PSBTSigner(self.ctx.wallet, data, qr_format, psbt_filename)
+        signer.check_sighash()
+        self.ctx.display.clear()
+        self.ctx.display.draw_centered_text(
+            "BLAKE2b chain only\nUnified SIGHASH_ALL (0x21)"
+        )
+        if not self.prompt(t("Proceed?"), BOTTOM_PROMPT_LINE):
+            return MENU_CONTINUE
 
         # memory management
         del data
