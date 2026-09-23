@@ -281,6 +281,8 @@ def is_version_greater(firmware_filename):
 # pylint: disable=too-many-return-statements
 def upgrade():
     """Installs new firmware from SD card"""
+    if SIGNER_PUBKEY is None:
+        return False
 
     firmware_path = "/%s/%s" % (SD_PATH, "firmware.bin")
     try:

@@ -64,7 +64,8 @@ def test_application_signatures_and_exports(m5stickv, tdata, kind, trim):
     assert found > 0
     exported = PSBT.parse(signer.psbt.serialize())
     assert all(inp.sighash_type == 0x21 for inp in exported.inputs)
-    assert signer.psbt_qr()[0] == signer.psbt.serialize()
+    serialized = signer.psbt.serialize()
+    assert signer.psbt_qr()[0] == serialized
 
 
 @pytest.mark.parametrize("encoding", ["raw", "base64", "ur"])
@@ -80,7 +81,7 @@ def test_unified_qr_encodings(m5stickv, tdata, encoding):
     raw = p.serialize()
     data, fmt = raw, FORMAT_NONE
     if encoding == "base64":
-        data, fmt = base64.b64encode(raw), FORMAT_PMOFN
+        data, fmt = base64.b64encode(raw).decode(), FORMAT_PMOFN
     elif encoding == "ur":
         data, fmt = UR("crypto-psbt", Types.psbt_to_cbor(raw)), FORMAT_UR
     signer = PSBTSigner(wallet_for(tdata, "P2WPKH"), data, fmt)
@@ -131,6 +132,7 @@ def test_home_chain_confirmation_and_export(mocker, m5stickv, tdata, mode):
     sd = mocker.patch.object(SDHandler, "__enter__", return_value=mocker.MagicMock())
     mocker.patch.object(SDHandler, "__exit__", return_value=False)
     opened = mocker.patch("builtins.open", mocker.mock_open())
+    opened().write.side_effect = len
     sign = mocker.spy(PSBT, "sign_with")
     if mode == "reject":
         with pytest.raises(ValueError, match="requires explicit unified"):

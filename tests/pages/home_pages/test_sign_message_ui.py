@@ -1,3 +1,4 @@
+import pytest
 from ...shared_mocks import MockPrinter, get_mock_open
 from .. import create_ctx
 from .test_home import tdata
@@ -99,25 +100,11 @@ def test_sign_message_invalid_derivations(mocker, m5stickv, tdata):
 
         qr_capturer = mocker.spy(QRCodeCapture, "qr_capture_loop")
 
-        message_signer.sign_message()
+        with pytest.raises(ValueError, match="disabled"):
+            message_signer.sign_message()
         qr_capturer.assert_called_once()
-
-        # ensure _is_valid_derivation_path was called with expected derivation
         message_signer._is_valid_derivation_path.assert_called_once_with(case[2])
-        message_signer.display_qr_codes.assert_has_calls(
-            [
-                mocker.call(case[3], FORMAT_NONE, "Signed Message"),
-                mocker.call(case[4], FORMAT_NONE, "Hex Public Key:"),
-            ]
-        )
-
-        # Address message should not be called, because our derivation is invalid
-        assert not any(
-            len(call.args) > 0 and call.args[0] == "Address:"
-            for call in ctx.display.draw_hcentered_text.call_args_list
-        )
-
-        assert ctx.input.wait_for_button.call_count == len(case[0])
+        message_signer.display_qr_codes.assert_not_called()
 
 
 def test_sign_message_at_address(mocker, m5stickv, tdata):
@@ -303,6 +290,10 @@ def test_sign_message_at_address(mocker, m5stickv, tdata):
             new=mocker.MagicMock(return_value=["somefile", "otherfile"]),
         )
 
+        if case[2] == b"":
+            with pytest.raises(ValueError, match="disabled"):
+                message_signer.sign_message()
+            continue
         message_signer.sign_message()
 
         qr_capturer.assert_called_once()
@@ -364,11 +355,12 @@ def test_load_from_sd_card(mocker, m5stickv, tdata):
     mocker.spy(sign_msg, "_export_signature")
     mocker.spy(sign_msg, "_export_to_qr")
 
-    # Successful sign a binary (that can't be decoded) from sd card
-    sign_msg.sign_message()
+    # Binary/raw data must not reach an arbitrary digest signer.
+    with pytest.raises(ValueError, match="disabled"):
+        sign_msg.sign_message()
 
     # Assert signature sucessfully exported to QR
-    sign_msg._export_signature.assert_called()
-    sign_msg._export_to_qr.assert_called()
+    sign_msg._export_signature.assert_not_called()
+    sign_msg._export_to_qr.assert_not_called()
 
-    assert ctx.input.wait_for_button.call_count == len(btn_seq)
+    assert ctx.input.wait_for_button.call_count == 0

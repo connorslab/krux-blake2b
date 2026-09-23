@@ -33,11 +33,12 @@ MIN_SPLASH_WAIT_TIME = 1000
 
 def draw_splash():
     """Display splash while loading modules"""
-    from krux.display import display, SPLASH
+    from krux.display import display
+    from krux.metadata import FORK_NAME
 
     display.initialize_lcd()
     display.clear()
-    display.draw_centered_text(SPLASH)
+    display.draw_centered_text(FORK_NAME + "\nUnified signing only")
 
 
 def check_for_updates():

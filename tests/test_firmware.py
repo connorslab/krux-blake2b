@@ -25,6 +25,7 @@ def tdata(mocker):
         "03dc8ffc42845af7a30be30e7fc342363f43bc6d11a6c1d833e4e2fc339a1d0491"
     )
     TEST_SIGNER_PUBLIC_KEY = ec.PublicKey.from_string(TEST_SIGNER_PUBKEY)
+    mocker.patch("krux.firmware.SIGNER_PUBKEY", TEST_SIGNER_PUBKEY)
 
     FILES_FOLDER = "files"
 
@@ -13955,3 +13956,12 @@ def test_upgrade_fail_not_this_device_exception(
     display_mocker.flash_text.assert_called_with(
         "Firmware not for this device", theme.error_color
     )
+
+
+def test_fork_updates_disabled_without_provisioned_key(mocker, m5stickv):
+    from krux import firmware
+
+    assert firmware.SIGNER_PUBKEY is None
+    write = mocker.spy(firmware, "write_data")
+    assert firmware.upgrade() is False
+    write.assert_not_called()

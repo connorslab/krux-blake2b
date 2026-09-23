@@ -20,4 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 VERSION = "26.08.0"
-SIGNER_PUBKEY = "03339e883157e45891e61ca9df4cd3bb895ef32d475b8e793559ea10a36766689b"
+FORK_NAME = "Krux BLAKE2b"
+# No fork release signing key has been provisioned. Do not trust upstream
+# firmware updates that would silently restore standard-chain signing.
+SIGNER_PUBKEY = None
