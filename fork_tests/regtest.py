@@ -15,11 +15,11 @@ import tempfile
 import time
 import urllib.request
 
-from embit import script
+from embit import hashes, script
 from embit.finalizer import finalize_psbt
 from embit.networks import NETWORKS
 from embit.transaction import Transaction
-from test_blake2b import ROOT, PUB, make_psbt
+from test_blake2b import ROOT, CHILD, PUB, make_psbt
 from krux.blake2b import sign_psbt
 
 
@@ -153,6 +153,7 @@ def main():
                 [
                     "-testactivationheight=blake2b@%d" % activation,
                     "-blake2b_headline=Krux disposable regtest",
+                    "-rdtsexpiry=%d" % (int(time.time()) + 365 * 86400),
                 ]
             )
             rpc("generatetoaddress", 1, sink)
@@ -161,6 +162,44 @@ def main():
             for kind, raw in raws:
                 accepted = rpc("testmempoolaccept", [raw], 0)[0]
                 assert accepted["allowed"], (kind, accepted)
+                if kind == "p2wpkh":
+                    source = next(p for name, p in cases if name == kind)
+                    for legacy_type in (1, 0x21):
+                        bad = Transaction.parse(bytes.fromhex(raw))
+                        tx = source.tx
+                        vin = tx.vin[0]
+                        sc = script.p2pkh_from_p2wpkh(
+                            source.inputs[0].utxo.script_pubkey
+                        )
+                        # Independent BIP143 ALL preimage, allowing the unknown
+                        # 0x20 bit as standard-chain consensus does for ECDSA.
+                        preimage = (
+                            tx.version.to_bytes(4, "little")
+                            + hashes.sha256(tx.hash_prevouts())
+                            + hashes.sha256(tx.hash_sequence())
+                            + bytes(reversed(vin.txid))
+                            + vin.vout.to_bytes(4, "little")
+                            + sc.serialize()
+                            + source.inputs[0].utxo.value.to_bytes(8, "little")
+                            + vin.sequence.to_bytes(4, "little")
+                            + hashes.sha256(tx.hash_outputs())
+                            + tx.locktime.to_bytes(4, "little")
+                            + legacy_type.to_bytes(4, "little")
+                        )
+                        digest = hashes.double_sha256(preimage)
+                        sig = CHILD.key.sign(digest).serialize() + b"\x21"
+                        bad.vin[0].witness = script.Witness([sig, PUB.sec()])
+                        rejected = rpc("testmempoolaccept", [bad.serialize().hex()], 0)[
+                            0
+                        ]
+                        assert not rejected["allowed"], rejected
+                        assert (
+                            "signature" in rejected.get("reject-reason", "").lower()
+                        ), rejected
+                    print(
+                        "Legacy digests stamped 0x21 rejected on the same unspent output",
+                        flush=True,
+                    )
                 txids.append(rpc("sendrawtransaction", raw, 0))
                 print(kind, "unified accepted", flush=True)
             mined = rpc("generatetoaddress", 1, sink)[0]

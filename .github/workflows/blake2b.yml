@@ -22,8 +22,16 @@ jobs:
         run: python -m pytest -q fork_tests vendor/embit/tests/tests/test_unified_sighash.py vendor/embit/tests/tests/test_unified_sighash_negotiation.py
       - name: Krux regression suite
         run: python -m pytest -q tests --tb=short > test-results.txt 2>&1
+      - name: Knots acceptance, mining and replay controls
+        run: |
+          curl --fail --location --output knots.tar.gz https://github.com/bitcoinknots/bitcoin/releases/download/v29.4.2.knots20260508/bitcoin-29.4.2.knots20260508-x86_64-linux-gnu.tar.gz
+          echo 'b59d0445a317e21a03dc29425db3aba79b27d5125230b1a2b1dce62e120827c5  knots.tar.gz' | sha256sum --check
+          tar -xzf knots.tar.gz
+          PYTHONPATH=src python fork_tests/regtest.py "$PWD/bitcoin-29.4.2.knots20260508/bin/bitcoind" | tee node-results.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
-          path: test-results.txt
+          path: |
+            test-results.txt
+            node-results.txt

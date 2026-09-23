@@ -236,3 +236,22 @@ def test_control_block_depth_limit(nodes):
     else:
         with pytest.raises(ValueError, match="seven nodes"):
             check_psbt(p)
+
+
+def test_unsigned_transaction_cannot_exceed_reduced_block_weight():
+    from embit.psbt import OutputScope
+
+    p = make_psbt()
+    p.outputs = [
+        OutputScope(vout=TransactionOutput(0, script.p2wpkh(PUB))) for _ in range(6500)
+    ]
+    with pytest.raises(ValueError, match="cannot fit"):
+        check_psbt(p)
+
+
+def test_missing_unified_dependency_fails_closed(monkeypatch):
+    from embit.transaction import SIGHASH
+
+    monkeypatch.delattr(SIGHASH, "UNIFIED")
+    with pytest.raises(ValueError, match="dependency"):
+        sign_psbt(make_psbt(), ROOT)
