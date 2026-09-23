@@ -2,12 +2,21 @@ name: Build
 
 on:
   workflow_dispatch:
+    inputs:
+      device:
+        description: Firmware target (all or a MaixPy project name)
+        required: true
+        default: maixpy_yahboom
+        type: choice
+        options:
+          - maixpy_yahboom
+          - all
 
 jobs:
   build:
     strategy:
       matrix:
-        device: [maixpy_m5stickv, maixpy_amigo, maixpy_dock, maixpy_yahboom, maixpy_cube, maixpy_wonder_mv, maixpy_tzt, maixpy_embed_fire, maixpy_wonder_k]
+        device: ${{ inputs.device == 'all' && fromJSON('["maixpy_m5stickv", "maixpy_amigo", "maixpy_dock", "maixpy_yahboom", "maixpy_cube", "maixpy_wonder_mv", "maixpy_tzt", "maixpy_embed_fire", "maixpy_wonder_k"]') || fromJSON(format('["{0}"]', inputs.device)) }}
     runs-on: ubuntu-latest
     services:
       registry:
