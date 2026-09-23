@@ -8,6 +8,23 @@ compilation and software tests do not establish camera, touchscreen, storage,
 or signing operation on the purchased hardware revision. Use a disposable
 test seed and unfunded wallet for the first checks.
 
+## Verified build output
+
+The [first successful Yahboom build](https://github.com/connorslab/krux-blake2b/actions/runs/35803283044)
+compiled source commit `7963857bd5062342f651fa19f38c6c80c7437180`.
+The subsequent documentation commits do not change the firmware source.
+
+- `firmware.bin`: 1,615,104 bytes (below the 3 MiB bootloader limit).
+- Firmware SHA-256: `0c09a6eec421759db1b4bb560e9ed534e7a9aa73ecc22b925741eb94e15709c8`.
+- `kboot.kfpkg`: 822,948 bytes.
+- Package SHA-256: `28c6515b6e709ad0ef975ceaf92a05ea274fa07ad5f643106d1d6171c7fd19e5`.
+
+Package CRCs, flash addresses and embedded-file equality were checked after
+download. The binary contains the fork branding and signing-policy strings.
+These checks establish build/package integrity, not hardware operation.
+The [source-commit signing CI](https://github.com/connorslab/krux-blake2b/actions/runs/35803283324)
+also passed, including the forked-node transaction checks.
+
 ## Build
 
 Run the repository's **Build** GitHub Actions workflow with device
