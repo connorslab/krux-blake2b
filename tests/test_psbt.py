@@ -941,7 +941,7 @@ def test_init_tr_miniscript_fails_not_tr_miniscript(mocker, m5stickv, tdata):
             PSBTSigner(wallet, case, FORMAT_NONE)
 
 
-def test_sign_singlesig(mocker, m5stickv, tdata):
+def test_reject_standard_singlesig(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_SINGLESIG
@@ -984,16 +984,11 @@ def test_sign_singlesig(mocker, m5stickv, tdata):
         print("test_sign_singlesig case: ", num)
         num += 1
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        if case[1] == FORMAT_BBQR:
-            psbt_qr = signer.psbt_qr()
-            assert psbt_qr[0].payload == case[2].payload
-            assert psbt_qr[1] == case[1]
-        else:
-            assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_singlesig_from_sdcard(mocker, m5stickv, tdata):
+def test_reject_standard_singlesig_from_sdcard(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_SINGLESIG
@@ -1018,21 +1013,11 @@ def test_sign_singlesig_from_sdcard(mocker, m5stickv, tdata):
         mock_file = MockFile(case[0])
         mocker.patch("builtins.open", mock_open(mock_file))
         signer = PSBTSigner(wallet, None, case[1], "dummy.psbt")
-        signer.sign(trim=False)
-        if num % 2 == 1:
-            # If test case num is odd, check if detected as base64
-            assert signer.is_b64_file
-            signed_psbt, _ = signer.psbt_qr()
-            with open("/sd/" + "dummy-signed.psbt", "w") as f:
-                f.write(signed_psbt)
-        else:
-            with open("/sd/" + "dummy-signed.psbt", "wb") as f:
-                signer.psbt.write_to(f)
-        assert mock_file.write_data == case[2]
-        num += 1
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_multisig(mocker, m5stickv, tdata):
+def test_reject_standard_multisig(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MULTISIG, P2SH, P2SH_P2WSH, P2WSH
@@ -1163,12 +1148,11 @@ def test_sign_multisig(mocker, m5stickv, tdata):
         print(f"Multisig case {n}")
         wallet = Wallet(case[0])
         signer = PSBTSigner(wallet, case[1], case[2])
-        signer.sign()
-        assert signer.psbt_qr() == (case[3], case[2])
-        n += 1
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_multisig_from_sdcard(mocker, m5stickv, tdata):
+def test_reject_standard_multisig_from_sdcard(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MULTISIG
@@ -1185,13 +1169,11 @@ def test_sign_multisig_from_sdcard(mocker, m5stickv, tdata):
         mock_file = MockFile(case[0])
         mocker.patch("builtins.open", return_value=mock_file)
         signer = PSBTSigner(wallet, None, case[1], "dummy.psbt")
-        signer.sign(trim=False)
-        with open("dummy-signed.psbt", "wb") as f:
-            signer.psbt.write_to(f)
-        assert mock_file.write_data == case[2]
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_multisig_with_descriptor(mocker, m5stickv, tdata):
+def test_reject_standard_multisig_with_descriptor(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MULTISIG
@@ -1213,19 +1195,19 @@ def test_sign_multisig_with_descriptor(mocker, m5stickv, tdata):
 
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
     # Repeat signatures with descriptor loaded and more checks
     wallet.load(WSH_MULTISIG, FORMAT_NONE)
     assert wallet.has_change_addr()
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_miniscript(mocker, m5stickv, tdata):
+def test_reject_standard_miniscript(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MINISCRIPT
@@ -1247,19 +1229,19 @@ def test_sign_miniscript(mocker, m5stickv, tdata):
 
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
     # Repeat signatures with descriptor loaded and more checks
     wallet.load(WSH_MINISCRIPT, FORMAT_NONE)
     assert wallet.has_change_addr()
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_miniscript_from_sdcard(mocker, m5stickv, tdata):
+def test_reject_standard_miniscript_from_sdcard(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MINISCRIPT
@@ -1276,19 +1258,11 @@ def test_sign_miniscript_from_sdcard(mocker, m5stickv, tdata):
         mock_file = MockFile(case[0])
         mocker.patch("builtins.open", mock_open(mock_file))
         signer = PSBTSigner(wallet, None, case[1], "dummy.psbt")
-        signer.sign(trim=False)
-        if i == 1:
-            assert signer.is_b64_file
-            signed_psbt, _ = signer.psbt_qr()
-            with open("/sd/" + "dummy-signed.psbt", "w") as f:
-                f.write(signed_psbt)
-        else:
-            with open("/sd/" + "dummy-signed.psbt", "wb") as f:
-                signer.psbt.write_to(f)
-        assert mock_file.write_data == case[2]
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_tr_miniscript_internal_key(mocker, m5stickv, tdata):
+def test_reject_standard_tr_miniscript_internal_key(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MINISCRIPT, P2TR
@@ -1312,19 +1286,21 @@ def test_sign_tr_miniscript_internal_key(mocker, m5stickv, tdata):
 
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
     # Repeat signatures with descriptor loaded and more checks
     wallet.load(TR_MINISCRIPT, FORMAT_NONE)
     assert wallet.has_change_addr()
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_tr_miniscript_internal_key_from_sdcard(mocker, m5stickv, tdata):
+def test_reject_standard_tr_miniscript_internal_key_from_sdcard(
+    mocker, m5stickv, tdata
+):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MINISCRIPT, P2TR
@@ -1347,19 +1323,11 @@ def test_sign_tr_miniscript_internal_key_from_sdcard(mocker, m5stickv, tdata):
         mock_file = MockFile(case[0])
         mocker.patch("builtins.open", mock_open(mock_file))
         signer = PSBTSigner(wallet, None, case[1], "dummy.psbt")
-        signer.sign(trim=False)
-        if i == 1:
-            assert signer.is_b64_file
-            signed_psbt, _ = signer.psbt_qr()
-            with open("/sd/" + "dummy-signed.psbt", "w") as f:
-                f.write(signed_psbt)
-        else:
-            with open("/sd/" + "dummy-signed.psbt", "wb") as f:
-                signer.psbt.write_to(f)
-        assert mock_file.write_data == case[2]
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_tr_miniscript_tap_tree(mocker, m5stickv, tdata):
+def test_reject_standard_tr_miniscript_tap_tree(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MINISCRIPT, P2TR
@@ -1388,19 +1356,19 @@ def test_sign_tr_miniscript_tap_tree(mocker, m5stickv, tdata):
 
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
     # Repeat signatures with descriptor loaded and more checks
     wallet.load(TR_MINISCRIPT, FORMAT_NONE)
     assert wallet.has_change_addr()
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_tr_miniscript_tap_tree_from_sdcard(mocker, m5stickv, tdata):
+def test_reject_standard_tr_miniscript_tap_tree_from_sdcard(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MINISCRIPT, P2TR
@@ -1424,19 +1392,11 @@ def test_sign_tr_miniscript_tap_tree_from_sdcard(mocker, m5stickv, tdata):
         mock_file = MockFile(case[0])
         mocker.patch("builtins.open", mock_open(mock_file))
         signer = PSBTSigner(wallet, None, case[1], "dummy.psbt")
-        signer.sign(trim=False)
-        if i == 1:
-            assert signer.is_b64_file
-            signed_psbt, _ = signer.psbt_qr()
-            with open("/sd/" + "dummy-signed.psbt", "w") as f:
-                f.write(signed_psbt)
-        else:
-            with open("/sd/" + "dummy-signed.psbt", "wb") as f:
-                signer.psbt.write_to(f)
-        assert mock_file.write_data == case[2]
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_tr_expanding_multisig(mocker, m5stickv, tdata):
+def test_reject_standard_tr_expanding_multisig(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MINISCRIPT, P2TR
@@ -1460,19 +1420,19 @@ def test_sign_tr_expanding_multisig(mocker, m5stickv, tdata):
 
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
     # Repeat signatures with descriptor loaded and more checks
     wallet.load(TR_EXP_MULTI_MINISCRIPT, FORMAT_NONE)
     assert wallet.has_change_addr()
     for case in cases:
         signer = PSBTSigner(wallet, case[0], case[1])
-        signer.sign()
-        assert signer.psbt_qr() == (case[2], case[1])
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
-def test_sign_tr_expanding_multisig_from_sdcard(mocker, m5stickv, tdata):
+def test_reject_standard_tr_expanding_multisig_from_sdcard(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from krux.psbt import PSBTSigner
     from krux.key import Key, TYPE_MINISCRIPT, P2TR
@@ -1495,16 +1455,8 @@ def test_sign_tr_expanding_multisig_from_sdcard(mocker, m5stickv, tdata):
         mock_file = MockFile(case[0])
         mocker.patch("builtins.open", mock_open(mock_file))
         signer = PSBTSigner(wallet, None, case[1], "dummy.psbt")
-        signer.sign(trim=False)
-        if i == 1:
-            assert signer.is_b64_file
-            signed_psbt, _ = signer.psbt_qr()
-            with open("/sd/" + "dummy-signed.psbt", "w") as f:
-                f.write(signed_psbt)
-        else:
-            with open("/sd/" + "dummy-signed.psbt", "wb") as f:
-                signer.psbt.write_to(f)
-        assert mock_file.write_data == case[2]
+        with pytest.raises(ValueError, match="requires explicit unified"):
+            signer.sign()
 
 
 def test_sign_fails_with_0_sigs_added(mocker, m5stickv, tdata):
@@ -1516,11 +1468,13 @@ def test_sign_fails_with_0_sigs_added(mocker, m5stickv, tdata):
 
     wallet = Wallet(Key(tdata.TEST_MNEMONIC, TYPE_MULTISIG, NETWORKS["test"]))
     signer = PSBTSigner(wallet, tdata.P2WSH_PSBT, FORMAT_NONE)
+    for inp in signer.psbt.inputs:
+        inp.sighash_type = 0x21
     mocker.patch.object(signer.psbt, "sign_with", mocker.MagicMock(return_value=0))
 
     with pytest.raises(ValueError):
         signer.sign()
-    signer.psbt.sign_with.assert_called_with(wallet.key.root)
+    signer.psbt.sign_with.assert_called_with(wallet.key.root, sighash=0x21)
 
 
 def test_check_sighash_rejects_sighash_none(mocker, m5stickv, tdata):
@@ -1536,7 +1490,7 @@ def test_check_sighash_rejects_sighash_none(mocker, m5stickv, tdata):
     # Inject SIGHASH_NONE into the first input
     signer.psbt.inputs[0].sighash_type = SIGHASH.NONE
 
-    with pytest.raises(ValueError, match="non-standard sighash type: 0x02"):
+    with pytest.raises(ValueError, match="requires explicit unified"):
         signer.sign()
 
 
@@ -1552,7 +1506,7 @@ def test_check_sighash_rejects_sighash_single(mocker, m5stickv, tdata):
     signer = PSBTSigner(wallet, tdata.P2WPKH_PSBT, FORMAT_NONE)
     signer.psbt.inputs[0].sighash_type = SIGHASH.SINGLE
 
-    with pytest.raises(ValueError, match="non-standard sighash type: 0x03"):
+    with pytest.raises(ValueError, match="requires explicit unified"):
         signer.sign()
 
 
@@ -1568,11 +1522,11 @@ def test_check_sighash_rejects_anyonecanpay(mocker, m5stickv, tdata):
     signer = PSBTSigner(wallet, tdata.P2WPKH_PSBT, FORMAT_NONE)
     signer.psbt.inputs[0].sighash_type = SIGHASH.ALL | SIGHASH.ANYONECANPAY
 
-    with pytest.raises(ValueError, match="non-standard sighash type: 0x81"):
+    with pytest.raises(ValueError, match="requires explicit unified"):
         signer.sign()
 
 
-def test_check_sighash_allows_default_and_all(mocker, m5stickv, tdata):
+def test_check_sighash_rejects_default_and_all(mocker, m5stickv, tdata):
     from embit.networks import NETWORKS
     from embit.transaction import SIGHASH
     from krux.psbt import PSBTSigner
@@ -1585,17 +1539,20 @@ def test_check_sighash_allows_default_and_all(mocker, m5stickv, tdata):
     # SIGHASH_ALL should be accepted (signs successfully)
     signer = PSBTSigner(wallet, tdata.P2WPKH_PSBT, FORMAT_NONE)
     signer.psbt.inputs[0].sighash_type = SIGHASH.ALL
-    signer.sign()  # Should not raise
+    with pytest.raises(ValueError, match="requires explicit unified"):
+        signer.sign()
 
     # SIGHASH_DEFAULT should be accepted
     signer = PSBTSigner(wallet, tdata.P2WPKH_PSBT, FORMAT_NONE)
     signer.psbt.inputs[0].sighash_type = SIGHASH.DEFAULT
-    signer.sign()  # Should not raise
+    with pytest.raises(ValueError, match="requires explicit unified"):
+        signer.sign()
 
     # None (unset) should be accepted
     signer = PSBTSigner(wallet, tdata.P2WPKH_PSBT, FORMAT_NONE)
     signer.psbt.inputs[0].sighash_type = None
-    signer.sign()  # Should not raise
+    with pytest.raises(ValueError, match="requires explicit unified"):
+        signer.sign()
 
 
 def test_check_sighash_reports_correct_input_index(mocker, m5stickv, tdata):
@@ -1608,6 +1565,8 @@ def test_check_sighash_reports_correct_input_index(mocker, m5stickv, tdata):
 
     wallet = Wallet(Key(tdata.TEST_MNEMONIC, TYPE_SINGLESIG, NETWORKS["test"]))
     signer = PSBTSigner(wallet, tdata.P2PKH_PSBT, FORMAT_NONE)
+    for inp in signer.psbt.inputs:
+        inp.sighash_type = 0x21
     # P2PKH_PSBT has 3 inputs; set non-standard sighash on the third one
     if len(signer.psbt.inputs) >= 3:
         signer.psbt.inputs[2].sighash_type = SIGHASH.NONE

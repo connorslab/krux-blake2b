@@ -10,8 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - name: Fetch pinned signing and QR dependencies
+        run: |
+          git submodule update --init --depth 1 vendor/embit firmware/MaixPy
+          git -C firmware/MaixPy submodule update --init --depth 1 components/micropython/port/src/bc-ur
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

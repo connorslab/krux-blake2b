@@ -1,11 +1,7 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - 'release-**'
+  workflow_dispatch:
 
 jobs:
   build:

@@ -339,15 +339,11 @@ def test_displayed_amount_is_the_signed_amount(mocker, m5stickv):
     # 9.999 BTC of a 0.001 BTC spend, the high fee warning must fire
     assert fee_percent >= 10.0
 
+    tx_input.sighash_type = 0x21
     signer.sign(trim=False)
     signature = list(signer.psbt.inputs[0].partial_sigs.values())[0]
     parsed = ec.Signature.parse(signature[:-1])
-    signed_over = tx.sighash_segwit(
-        0,
-        script.p2pkh_from_p2wpkh(script_pubkey),
-        real_value,
-        sighash=SIGHASH.ALL,
-    )
+    signed_over = signer.psbt.sighash(0, sighash=0x21)
     assert pubkey.verify(parsed, signed_over)
 
 
@@ -390,17 +386,7 @@ def test_compressed_parse_keeps_legacy_psbt_usable(mocker, m5stickv):
     assert format_btc(100000000) in messages[0]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Segwit inputs are not required to carry a previous transaction, so "
-    "their amounts stay unverified. Signing the same transaction twice, each "
-    "session declaring a different input truthfully, yields one valid signature "
-    "per input. Krux warns about this through unverified_input_amounts() but "
-    "still signs if the user proceeds. Rejecting instead would need previous "
-    "transactions on segwit inputs, which Sparrow deliberately omits for Krux "
-    "and the other airgapped signers in WalletModel.alwaysIncludeNonWitnessUtxo.",
-)
-def test_segwit_input_amounts_are_verified(m5stickv):
+def test_unified_commits_to_all_segwit_input_amounts(m5stickv):
     """Documents the residual exposure on multi input segwit transactions"""
     from embit import script
     from embit.psbt import PSBT
@@ -431,6 +417,8 @@ def test_segwit_input_amounts_are_verified(m5stickv):
             value_1, script.p2wpkh(pubkey_1)
         )
         psbt.inputs[1].bip32_derivations[pubkey_1] = derivation_1
+        for inp in psbt.inputs:
+            inp.sighash_type = 0x21
         return psbt.serialize()
 
     def signatures(raw):
@@ -438,13 +426,9 @@ def test_segwit_input_amounts_are_verified(m5stickv):
         signer.sign(trim=False)
         return [list(inp.partial_sigs.values())[0] for inp in signer.psbt.inputs]
 
-    try:
-        truthful = signatures(build(100000000, 100000000))
-        session_a = signatures(build(100000000, 1000))
-        session_b = signatures(build(1000, 100000000))
-    except ValueError:
-        # Rejected at load, which is the outcome this test wants
-        return
+    truthful = signatures(build(100000000, 100000000))
+    session_a = signatures(build(100000000, 1000))
+    session_b = signatures(build(1000, 100000000))
 
     # A device that verified segwit amounts would never produce these
     assert session_a[0] != truthful[0]

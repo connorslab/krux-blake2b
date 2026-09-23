@@ -1,8 +1,9 @@
 """Actual signatures, strict negotiation, and hostile PSBT regression tests."""
 
 import pytest
-from embit import bip32, ec, script
+from embit import bip32, ec, hashes, script
 from embit.psbt import PSBT, DerivationPath
+from embit.util import secp256k1
 from embit.transaction import Transaction, TransactionInput, TransactionOutput
 from krux.blake2b import UNIFIED_ALL, check_psbt, sign_psbt, _check_script
 
@@ -15,7 +16,19 @@ PUB = CHILD.get_public_key()
 def make_psbt(kind="p2wpkh", count=1):
     redeem = None
     witness = None
-    if kind == "p2tr":
+    if kind == "tapscript":
+        internal = ROOT.derive("m/0").get_public_key()
+        leaf = script.Script(b"\x20" + PUB.xonly() + b"\xac")
+        leaf_hash = hashes.tagged_hash("TapLeaf", b"\xc0" + leaf.serialize())
+        output_key = internal.taproot_tweak(leaf_hash)
+        point = secp256k1.ec_pubkey_parse(b"\x02" + internal.xonly())
+        tweak = hashes.tagged_hash("TapTweak", internal.xonly() + leaf_hash)
+        parity = (
+            secp256k1.ec_pubkey_serialize(secp256k1.ec_pubkey_add(point, tweak))[0] & 1
+        )
+        control = bytes([0xC0 | parity]) + internal.xonly()
+        spk = script.Script(b"\x51\x20" + output_key.xonly())
+    elif kind == "p2tr":
         spk = script.p2tr(PUB)
     elif kind == "p2pkh":
         spk = script.p2pkh(PUB)
@@ -54,7 +67,12 @@ def make_psbt(kind="p2wpkh", count=1):
         else:
             inp.witness_utxo = prev.vout[i]
         path = DerivationPath(ROOT.my_fingerprint, bip32.parse_path(PATH))
-        if kind == "p2tr":
+        if kind == "tapscript":
+            inp.taproot_internal_key = internal
+            inp.taproot_merkle_root = leaf_hash
+            inp.taproot_scripts[control] = leaf.data + b"\xc0"
+            inp.taproot_bip32_derivations[PUB] = ([leaf_hash], path)
+        elif kind == "p2tr":
             inp.taproot_internal_key = PUB
             inp.taproot_bip32_derivations[PUB] = ([], path)
         else:
@@ -190,3 +208,31 @@ def test_psbt_roundtrip_preserves_explicit_opt_in():
     restored = PSBT.parse(p.serialize())
     assert restored.inputs[0].sighash_type == 0x21
     assert sign_psbt(restored, ROOT) == 1
+
+
+def test_tapscript_signs_unified_leaf_digest():
+    p = make_psbt("tapscript")
+    assert sign_psbt(p, ROOT) == 1
+    (pub, leaf_hash), sig = next(iter(p.inputs[0].taproot_sigs.items()))
+    leaf = next(iter(p.inputs[0].taproot_scripts.values()))
+    assert len(sig) == 65 and sig[-1] == 0x21
+    digest = p.sighash(
+        0, sighash=0x21, script=script.Script(leaf[:-1]), leaf_version=leaf[-1]
+    )
+    assert pub.schnorr_verify(ec.SchnorrSig.parse(sig[:-1]), digest)
+    standard = p.sighash(
+        0, sighash=1, ext_flag=1, script=script.Script(leaf[:-1]), leaf_version=leaf[-1]
+    )
+    assert not pub.schnorr_verify(ec.SchnorrSig.parse(sig[:-1]), standard)
+
+
+@pytest.mark.parametrize("nodes", [7, 8])
+def test_control_block_depth_limit(nodes):
+    p = make_psbt("tapscript")
+    control, leaf = next(iter(p.inputs[0].taproot_scripts.items()))
+    p.inputs[0].taproot_scripts = {control + b"x" * (32 * nodes): leaf}
+    if nodes == 7:
+        check_psbt(p)
+    else:
+        with pytest.raises(ValueError, match="seven nodes"):
+            check_psbt(p)

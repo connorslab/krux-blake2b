@@ -234,32 +234,8 @@ class SignMessage(Utils):
 
     def sign_standard_message(self, data):
         """Signs a standard message"""
-        message_hash, is_raw_hash = self._compute_message_hash(data)
-        if message_hash is None:
-            return ""
-
-        if is_raw_hash:
-            self.ctx.display.clear()
-            self.ctx.display.draw_centered_text(
-                t("Warning:")
-                + "\n\n"
-                + t("Signing raw hash. Proceed only if you trust the source."),
-                highlight_prefix=":",
-            )
-            if not self.prompt(t("Proceed?"), BOTTOM_PROMPT_LINE):
-                return ""
-
-        self.ctx.display.clear()
-        self.ctx.display.draw_centered_text(
-            "SHA256:\n\n%s" % binascii.hexlify(message_hash).decode(),
-            highlight_prefix=":",
-        )
-        if not self.prompt(t("Sign?"), BOTTOM_PROMPT_LINE):
-            return ""
-
-        sig = self.ctx.wallet.key.sign(message_hash).serialize()
-        self._display_signature(base_encode(sig, 64))
-        return sig
+        # Raw hashes can be legacy transaction digests. No bypass of 0x21 policy.
+        raise ValueError("Raw-hash signing is disabled in the BLAKE2b fork")
 
     def _compute_message_hash(self, data):
         """Computes the hash for the message, returns (hash, is_raw_hash)"""
