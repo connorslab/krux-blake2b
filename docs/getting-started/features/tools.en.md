@@ -3,25 +3,25 @@ Here are some useful tools that are available as soon as Krux starts! These are 
 <img src="../../../img/maixpy_amigo/tools-options-300.png" class="amigo">
 <img src="../../../img/maixpy_m5stickv/tools-options-250.png" class="m5stickv">
 
-### Datum Tool
+### Data Tools
 <img src="../../../img/maixpy_m5stickv/tools-datum-tool-load-250.png" align="right" class="m5stickv">
 <img src="../../../img/maixpy_amigo/tools-datum-tool-load-300.png" align="right" class="amigo">
 
-Datum Tool is an advanced, educational feature that treats all input as a simple *datum*. It provides flexibility for working with QR codes, manually entered text, and files from SD
+Data Tools lets you inspect, convert, encrypt and export text or binary data from QR codes, manual entry and SD-card files. It is a general-purpose data utility.
 
 <div style="clear: both"></div>
 
 <img src="../../../img/maixpy_m5stickv/tools-datum-tool-loaded-250.png" align="right" class="m5stickv">
 <img src="../../../img/maixpy_amigo/tools-datum-tool-loaded-300.png" align="right" class="amigo">
 
-Once datum has been loaded, it offers meta information about the contents and ability to View Datum - whether text or binary. It also offers a menu to Convert Datum, Export to QR, and Export to SD.
+Once data has been loaded, you can inspect information about its contents and use View Data to read text or binary data. It also offers a menu to Convert Data, Export to QR, and Export to SD.
 
 <div style="clear: both"></div>
 
 <img src="../../../img/maixpy_m5stickv/tools-datum-tool-convert-250.png" align="right" class="m5stickv">
 <img src="../../../img/maixpy_amigo/tools-datum-tool-convert-300.png" align="right" class="amigo">
 
-The Convert Datum menu allows access to common encodings for conversion between bytes and string data. It also offers access to Encrypt contents with full-control to make specific encryption choices. For more info, see [encryption](./encryption/encryption.md).
+The Convert Data menu allows access to common encodings for conversion between bytes and string data. It also offers access to Encrypt contents with full-control to make specific encryption choices. For more info, see [encryption](./encryption/encryption.md).
 
 <div style="clear: both"></div>
 

@@ -354,7 +354,7 @@ def test_datumtoolmenu_text_entry_abort(m5stickv, mocker):
     page = DatumToolMenu(ctx).run()
     assert ctx.input.wait_for_button.call_count == len(BTN_SEQUENCE)
 
-    # add text but then abort out of Datum Tool
+    # add text but then abort out of Data Tools
     BTN_SEQUENCE = (
         BUTTON_PAGE,  # to Text Entry
         BUTTON_ENTER,  # go Text Entry
@@ -846,8 +846,8 @@ def test_datumtool__build_options_menu(m5stickv, mocker):
     menu = page._build_options_menu()
     assert ctx.input.wait_for_button.call_count == 0
     assert [name for name, func in menu] == [
-        "Show Datum",
-        "Convert Datum",
+        "View Data",
+        "Convert Data",
         "QR Code",
         "Save to SD card",
     ]
@@ -1066,10 +1066,10 @@ def test_datumtool_view_contents_multi_page(m5stickv, mocker):
 
     # call with text that will span more than one page
     BTN_SEQUENCE = [
-        BUTTON_ENTER,  # go Show Datum
+        BUTTON_ENTER,  # go View Data
         BUTTON_PAGE,  # page
         BUTTON_PAGE_PREV,  # page_prev
-        BUTTON_ENTER,  # escape Show Datum
+        BUTTON_ENTER,  # escape View Data
         BUTTON_PAGE_PREV,  # to Back
         BUTTON_ENTER,  # go Back
     ]
@@ -1089,8 +1089,8 @@ def test_datumtool_view_contents_multi_page(m5stickv, mocker):
 
     # call with bytes that will span more than one page
     BTN_SEQUENCE = [
-        BUTTON_ENTER,  # go Show Datum
-        BUTTON_ENTER,  # escape Show Datum
+        BUTTON_ENTER,  # go View Data
+        BUTTON_ENTER,  # escape View Data
         BUTTON_PAGE_PREV,  # to Back
         BUTTON_ENTER,  # go Back
     ]

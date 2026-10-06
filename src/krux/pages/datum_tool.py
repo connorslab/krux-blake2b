@@ -291,7 +291,7 @@ def detect_encodings(str_data, verify=True):
 
 
 class DatumToolMenu(Page):
-    """Krux Datum Tool Menu"""
+    """Krux Data Tools Menu"""
 
     def __init__(self, ctx):
         super().__init__(
@@ -398,7 +398,7 @@ class DatumToolMenu(Page):
 
 
 class DatumTool(Page):
-    """Krux Datum Tool"""
+    """Krux Data Tools"""
 
     def __init__(self, ctx):
         super().__init__(ctx, None)
@@ -733,10 +733,10 @@ class DatumTool(Page):
         menu = []
 
         if offer_show:
-            menu.append((t("Show Datum"), lambda: "show"))
+            menu.append((t("View Data"), lambda: "show"))
 
         if not offer_convert:
-            menu.append((t("Convert Datum"), lambda: "convert_begin"))
+            menu.append((t("Convert Data"), lambda: "convert_begin"))
             menu.append((t("QR Code"), lambda: "export_qr"))
 
             # when not sensitive, allow export to sd

@@ -14,7 +14,7 @@ When Krux detects data resembling a KEF-encrypted envelope, it prompts the user 
 
 KEF envelopes are deliberately opaque, providing no information about their contents or the key needed for decryption. It is the user’s responsibility to track this—by noting what each envelope contains, how to decrypt it, and assigning an ID at encryption to help recall its contents and locate the correct key. During encryption, Krux suggests an ID that the user can modify. For mnemonics, the default ID is the wallet fingerprint without a passphrase; for wallet output descriptors, it defaults to the wallet’s generic policy.
 
-Within the Tools menu, users may experiment with [Datum tool](../tools.md/#datum-tool) for encrypting small to mid-sized contents (less than 50K bytes) and for decrypting KEF envelopes.
+Within the Tools menu, users may experiment with [Data Tools](../tools.md/#data-tools) for encrypting small to mid-sized contents (less than 50K bytes) and for decrypting KEF envelopes.
 
 ### Regarding BIP39 Mnemonics
 

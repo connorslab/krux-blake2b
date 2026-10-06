@@ -166,7 +166,7 @@ It is possible to change any of the **wallet's attributes** (it will be possible
 
 You can type or scan a BIP39 passphrase. When typing, swipe left :material-gesture-swipe-left: or right :material-gesture-swipe-right: to change keypads if your device has a touchscreen. Hold `PAGE` or `PREVIOUS` to move quickly through letters, and hold `ENTER` to jump to the next keypad.
 
-For scanning, you can generate an offline passphrase QR code using the [Datum tool](../features/tools.md/#datum-tool).
+For scanning, you can generate an offline passphrase QR code using the [Data Tools](../features/tools.md/#data-tools).
 
 **Note**: [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#from-mnemonic-to-seed) requires passphrases to be NFKD-normalized. Due to firmware size constraints, Krux cannot perform normalization internally. We therefore recommend using only ASCII QR codes or ensuring any non-ASCII are already normalized to NFKD.
 

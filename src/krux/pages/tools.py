@@ -33,7 +33,7 @@ from . import (
 )
 from ..krux_settings import t
 
-# TODO: re-enable "Create a QR Code" (and keypads ^^^) once encryption is possible w/o Datum Tool
+# TODO: re-enable "Create a QR Code" (and keypads ^^^) once encryption is possible w/o Data Tools
 
 
 class Tools(Page):
@@ -45,7 +45,7 @@ class Tools(Page):
             Menu(
                 ctx,
                 [
-                    (t("Datum Tool"), self.datum_tool),
+                    (t("Data Tools"), self.datum_tool),
                     (t("Device Tests"), self.device_tests),
                     # (t("Create QR Code"), self.create_qr),
                     (t("Descriptor Addresses"), self.descriptor_addresses),
@@ -77,7 +77,7 @@ class Tools(Page):
                 return ret
 
     def datum_tool(self):
-        """Handler for the 'Datum Tool' menu item"""
+        """Handler for the 'Data Tools' menu item"""
         import sys
         from .datum_tool import DatumToolMenu
 
