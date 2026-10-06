@@ -24,6 +24,6 @@ This records checksum comparison, not independent verification of the PGP signer
 
 ## Limits
 
-No physical-device testing, R36S port, production signing, seed-storage audit or hardware extraction assessment has been performed. Regtest does not establish the user's live node configuration. Offline checks do not replace full script/consensus validation. There is no replay-isolation claim against another chain implementing the same unified algorithm.
+Physical-device testing is limited to Yahboom K210 USB installation, successful bootloader validation and serial startup, including GC2145 sensor detection (see [build record](YAHBOOM-TEST-BUILD.md)). No hardware signing, touchscreen/QR functional testing, R36S port, production signing, seed-storage audit or hardware extraction assessment has been performed. Regtest does not establish the user's live node configuration. Offline checks do not replace full script/consensus validation. There is no replay-isolation claim against another chain implementing the same unified algorithm.
 
 A fork firmware-signing key has not been provisioned; SD firmware updates are disabled instead of accepting standard Krux firmware. For host regression results, inspect the **BLAKE2b signing** Actions run for the exact commit being used. Run commands are in the README.

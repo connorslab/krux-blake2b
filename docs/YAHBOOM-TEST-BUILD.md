@@ -3,10 +3,10 @@
 Target: Yahboom K210 Vision Sensor / Vision Recognition Module with the
 2-inch touchscreen (`maixpy_yahboom`). This is not a K230 image.
 
-This is experimental firmware awaiting a physical device test. Successful
-compilation and software tests do not establish camera, touchscreen, storage,
-or signing operation on the purchased hardware revision. Use a disposable
-test seed and unfunded wallet for the first checks.
+This is experimental firmware. USB installation and serial startup have been
+checked on a physical Yahboom K210. Touchscreen navigation, camera QR scanning,
+seed persistence and transaction signing still require functional checks. Use
+a disposable test seed and unfunded wallet for those checks.
 
 ## Verified build output
 
@@ -70,3 +70,20 @@ upstream automatic installer that replaces this image with standard Krux.
 
 See [chain rules](BLAKE2B.md) and [software validation](BLAKE2B-VALIDATION.md)
 for the scope and limitations of the existing tests.
+
+## Bitcoin/XBT build installed on 2026-10-06
+
+Source commit: `f181e6864c5d390dcd2f2c37fda57e5708e77444`.
+[Build run](https://github.com/connorslab/krux-blake2b/actions/runs/37482234091)
+and [signing tests](https://github.com/connorslab/krux-blake2b/actions/runs/37482234682) passed.
+
+- Firmware size: 1,615,104 bytes.
+- Firmware SHA-256: `4bf47be4daf0b64ebfb5a64089aaa6fb9e982d49ecb4e45642c0603eaa839e3e`.
+- Package SHA-256: `28097345c28b2e4fc8a3de1112b15c193f29bdcabaafd8178f9694505739786d`.
+- Package CRCs, flash addresses, embedded files and Bitcoin/XBT branding checked.
+- USB flashing through CH340 completed successfully; bootloader reported App ok
+  and started the new image without a traceback in the captured startup log.
+- Runtime detected a GC2145 camera sensor. QR scanning was not tested.
+- SD was absent from the device during startup; the separate PC card was
+  formatted FAT32/MBR and received a hash-verified copy of the USB-install bundle.
+  That copy does not enable SD firmware upgrades.

@@ -2,7 +2,7 @@
 
 An unofficial fork of [Krux](https://github.com/selfcustody/krux) for Bitcoin (XBT), targeting the BLAKE2b proof-of-work rules implemented by Bitcoin Knots. **Transaction signing requires the new unified signature hash: `SIGHASH_UNIFIED | SIGHASH_ALL`, byte `0x21`.** There is no standard-chain signing switch or automatic downgrade.
 
-**Experimental source implementation.** Signing has been tested against a disposable Knots regtest node. Physical Krux hardware, production use and R36S/R36XS compatibility have not been verified. No hardware-ready release is claimed.
+**Experimental source implementation.** Signing has been tested against a disposable Knots regtest node. A Yahboom K210 has passed USB installation and serial startup checks. Touchscreen operation, QR scanning, seed persistence, hardware transaction signing, production use and R36S/R36XS compatibility remain unverified.
 
 ## Compatibility changes
 
@@ -28,7 +28,7 @@ An offline signer cannot prove which chain supplied an address or PSBT. Replay p
 ## Requirements
 
 - Host development: Python 3.11/3.12. Linux is recommended for the native BC-UR module and firmware toolchain. The small cryptographic policy suite also runs on Windows.
-- Hardware targets: upstream Krux's K210 devices with camera, screen and controls. This fork has not been tested on them. **R36S/R36XS support is deferred.**
+- Hardware targets: upstream Krux's K210 devices with camera, screen and controls. Yahboom USB installation and startup have been checked; full hardware functional testing remains pending. **R36S/R36XS support is deferred.**
 - Consensus reference: Bitcoin Knots `v29.4.2.knots20260508`, commit `58398baf33e588779685ead478e6397bb28ed3d6`.
 - Legacy inputs retain Krux's verified previous-transaction requirement. Standard-chain PSBTs require deliberate preparation by a fork-aware coordinator; the signer does not silently convert them.
 
