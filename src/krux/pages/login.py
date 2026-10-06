@@ -405,7 +405,7 @@ class Login(MnemonicLoader):
         from ..metadata import VERSION
         from ..qr import FORMAT_NONE
 
-        title = "selfcustody.github.io/krux"
+        title = "https://github.com/connorslab/krux-blake2b"
         msg = (
             title
             + "\n"

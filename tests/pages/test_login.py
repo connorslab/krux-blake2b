@@ -1572,7 +1572,7 @@ def test_about(mocker, multiple_devices):
 
     login.about()
 
-    title = "selfcustody.github.io/krux"
+    title = "https://github.com/connorslab/krux-blake2b"
     msg = (
         title
         + "\n"
