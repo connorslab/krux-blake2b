@@ -34,11 +34,18 @@ MIN_SPLASH_WAIT_TIME = 1000
 def draw_splash():
     """Display splash while loading modules"""
     from krux.display import display
-    from krux.metadata import FORK_NAME
+    from krux.boot_logo import draw_boot_logo
 
     display.initialize_lcd()
     display.clear()
-    display.draw_centered_text(FORK_NAME + "\nUnified signing only")
+    draw_boot_logo(display)
+    # Frozen asset bytes need not remain imported while the wallet is running.
+    sys.modules.pop("krux.boot_logo_data", None)
+    sys.modules.pop("krux.boot_logo", None)
+    import krux
+    for name in ("boot_logo_data", "boot_logo"):
+        if hasattr(krux, name):
+            delattr(krux, name)
 
 
 def check_for_updates():
