@@ -18,7 +18,7 @@ BLAKE2b is the chain's proof-of-work algorithm. The unified signature digest its
 
 ## Signing workflow
 
-1. Connect a compatible coordinator, such as [Shrike](https://github.com/privkeyio/shrike), to the BLAKE2b chain.
+1. Connect a compatible coordinator, such as [Shrike](https://github.com/privkeyio/shrike), to Bitcoin using the required BLAKE2b proof-of-work consensus rules.
 2. Export an unfinalized PSBT with explicit unified ALL (`0x21`) on all inputs and all spent-output amounts/scripts.
 3. Import by QR or SD. Confirm the chain prompt, then review destinations, amounts, change and fees on the device.
 4. Export the signed PSBT. The coordinator finalizes it and the fork-aware node validates and broadcasts it.

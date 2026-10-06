@@ -1,4 +1,4 @@
-# Yahboom K210 BLAKE2b test firmware
+# Yahboom K210 Bitcoin (XBT) test firmware
 
 Target: Yahboom K210 Vision Sensor / Vision Recognition Module with the
 2-inch touchscreen (`maixpy_yahboom`). This is not a K230 image.
@@ -51,7 +51,7 @@ dependencies are pinned as Git submodules.
    Replace `COM6` with the actual port. Yahboom requires an explicit port.
    Do not disconnect power until flashing completes. If communication is
    unreliable, retry with a lower baud rate such as `115200`.
-4. Restart and verify the **Krux BLAKE2b** startup branding. Use USB power;
+4. Restart and verify the **Krux Bitcoin** startup branding. Use USB power;
    this module does not include a battery.
 
 The fork has no provisioned firmware signing key. SD firmware upgrades are
@@ -64,7 +64,7 @@ upstream automatic installer that replaces this image with standard Krux.
 - Scan QR codes from a disposable wallet, including animated transaction QR.
 - Create an encrypted test-seed backup on a compatible microSD card, restart,
   and verify recovery with the correct password and refusal with a wrong one.
-- Sign a BLAKE2b test transaction using explicit unified SIGHASH_ALL `0x21`.
+- Sign a Bitcoin test transaction using explicit unified SIGHASH_ALL `0x21`.
 - Verify the signature with a compatible node, and verify that a PSBT with
   missing or legacy sighash values is refused.
 
