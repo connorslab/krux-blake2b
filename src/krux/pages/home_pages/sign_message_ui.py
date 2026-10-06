@@ -235,7 +235,7 @@ class SignMessage(Utils):
     def sign_standard_message(self, data):
         """Signs a standard message"""
         # Raw hashes can be legacy transaction digests. No bypass of 0x21 policy.
-        raise ValueError("Raw-hash signing is disabled in the BLAKE2b fork")
+        raise ValueError("Raw-hash signing is disabled")
 
     def _compute_message_hash(self, data):
         """Computes the hash for the message, returns (hash, is_raw_hash)"""

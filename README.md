@@ -1,6 +1,6 @@
-# Krux BLAKE2b
+# Krux Bitcoin (XBT)
 
-An unofficial fork of [Krux](https://github.com/selfcustody/krux) for the Bitcoin BLAKE2b chain implemented by Bitcoin Knots. **Transaction signing requires the new unified signature hash: `SIGHASH_UNIFIED | SIGHASH_ALL`, byte `0x21`.** There is no standard-chain signing switch or automatic downgrade.
+An unofficial fork of [Krux](https://github.com/selfcustody/krux) for Bitcoin (XBT), targeting the BLAKE2b proof-of-work rules implemented by Bitcoin Knots. **Transaction signing requires the new unified signature hash: `SIGHASH_UNIFIED | SIGHASH_ALL`, byte `0x21`.** There is no standard-chain signing switch or automatic downgrade.
 
 **Experimental source implementation.** Signing has been tested against a disposable Knots regtest node. Physical Krux hardware, production use and R36S/R36XS compatibility have not been verified. No hardware-ready release is claimed.
 
@@ -8,7 +8,7 @@ An unofficial fork of [Krux](https://github.com/selfcustody/krux) for the Bitcoi
 
 - Pins [privkeyio/embit](https://github.com/privkeyio/embit) at `087d020fbfb66fc2e0eab88fb948269e1da28e95`, including unified hashing and PSBT negotiation. Tests and firmware builds use this same submodule pin.
 - Requires every input to explicitly request **unified ALL (`0x21`)**. Missing/default, standard ALL, NONE, SINGLE, ANYONECANPAY and unknown modes fail before any signatures are produced.
-- Shows a BLAKE2b/unified confirmation before transaction review. QR exports preserve the explicit sighash declaration.
+- Uses Bitcoin as the currency name and XBT for transaction amounts. Shows a Bitcoin/unified confirmation before transaction review. QR exports preserve the explicit sighash declaration.
 - Rejects existing standard signatures and finalized inputs. Multisig coordinators must exchange unfinalized PSBTs and use unified ALL for every signer.
 - Adds conservative checks for reduced-data (RDTS) rules: output-script size, script push size, taproot control blocks, tapscript conditionals and oversized unsigned transactions. Corrects the Taproot key-path fee estimate for its explicit sighash byte.
 - Disables arbitrary/raw-hash message signing, which could bypass the transaction policy. Bitcoin-prefixed address-message proofs remain available; those proofs are not chain-specific.

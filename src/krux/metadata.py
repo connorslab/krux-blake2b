@@ -20,7 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 VERSION = "26.08.0"
-FORK_NAME = "Krux BLAKE2b"
+FORK_NAME = "Krux Bitcoin"
+CURRENCY_TICKER = "XBT"
 # No fork release signing key has been provisioned. Do not trust upstream
 # firmware updates that would silently restore standard-chain signing.
 SIGNER_PUBKEY = None

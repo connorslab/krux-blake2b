@@ -35,7 +35,7 @@ SELF_TRANSFER = 1
 SPEND = 2
 
 # We always uses thin spaces after the ₿ in this file
-BTC_SYMBOL = "₿"
+from .metadata import CURRENCY_TICKER
 
 MAX_POLICY_COSIGNERS_DISPLAYED = 5
 
@@ -301,7 +301,7 @@ class PSBTSigner:
     def _btc_render(self, amount, prefix=" "):
         from .format import format_btc
 
-        return prefix + BTC_SYMBOL + THIN_SPACE + "%s" % format_btc(amount)
+        return prefix + CURRENCY_TICKER + THIN_SPACE + "%s" % format_btc(amount)
 
     def _get_resume_fee(self, inp_amount, out_amount, output_policy_count):
         from .format import replace_decimal_separator

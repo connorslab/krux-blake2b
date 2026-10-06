@@ -140,7 +140,7 @@ def test_home_chain_confirmation_and_export(mocker, m5stickv, tdata, mode):
     else:
         home.sign_psbt()
         ctx.display.draw_centered_text.assert_any_call(
-            "BLAKE2b chain only\nUnified SIGHASH_ALL (0x21)"
+            "Bitcoin only\nUnified SIGHASH_ALL (0x21)"
         )
     if mode in ("cancel", "reject", "high-fee"):
         sign.assert_not_called()
