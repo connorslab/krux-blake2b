@@ -4,6 +4,10 @@ An unofficial fork of [Krux](https://github.com/selfcustody/krux) for Bitcoin (X
 
 **Experimental source implementation.** Signing has been tested against a disposable Knots regtest node. A Yahboom K210 has passed USB installation and serial startup checks. Touchscreen operation, QR scanning, seed persistence, hardware transaction signing, production use and R36S/R36XS compatibility remain unverified.
 
+## Upstream update
+
+Merged Krux v26.09.0, including the MaixPy AES-GCM tag-buffer fix, mnemonic recovery and cancellation fixes, numeric editor guidance, and the versioned startup disclaimer. The pinned privkeyio/embit already includes upstream Embit v0.8.2 PSBT hardening; its unified-signature additions are retained. Existing KEF envelopes remain compatible.
+
 ## Compatibility changes
 
 - Pins [privkeyio/embit](https://github.com/privkeyio/embit) at `087d020fbfb66fc2e0eab88fb948269e1da28e95`, including unified hashing and PSBT negotiation. Tests and firmware builds use this same submodule pin.
