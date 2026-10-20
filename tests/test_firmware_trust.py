@@ -17,7 +17,7 @@ def test_embedded_key_matches_published_key():
 
 @pytest.mark.parametrize("failure", [
     None, "wrong-key", "changed-sd-file", "trailing-signature",
-    "corrupt-flash", "short-read", "bad-header",
+    "corrupt-flash", "short-read", "bad-header", "bad-boot-checksum",
 ])
 def test_signed_upgrade_activation(mocker, m5stickv, failure):
     from krux import firmware as fw
@@ -57,6 +57,8 @@ def test_signed_upgrade_activation(mocker, m5stickv, failure):
                 return result[:-1]
             if failure == "bad-header" and count == 5:
                 return b"\xff" * 5
+            if failure == "bad-boot-checksum" and address == fw.FIRMWARE_SLOT_2 + 5 + len(payload):
+                return b"\xff" * 32
             if failure == "corrupt-flash" and count != 5:
                 return b"!" + result[1:]
         return result

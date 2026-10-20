@@ -186,9 +186,12 @@ def sha256(firmware_filename, firmware_size=None):
 
 def verify_written_firmware(address, size, expected_hash):
     """Check actual flash bytes against the signed digest before activation."""
-    if flash.read(address, 5) != b"\x00" + size.to_bytes(4, "little"):
+    header = b"\x00" + size.to_bytes(4, "little")
+    if flash.read(address, 5) != header:
         return False
     hasher = uhashlib_hw.sha256()
+    boot_hasher = uhashlib_hw.sha256()
+    boot_hasher.update(header)
     offset = 0
     while offset < size:
         wdt.feed()
@@ -197,8 +200,12 @@ def verify_written_firmware(address, size, expected_hash):
         if len(chunk) != count:
             return False
         hasher.update(chunk)
+        boot_hasher.update(chunk)
         offset += count
-    return hasher.digest() == expected_hash
+    return (
+        hasher.digest() == expected_hash
+        and flash.read(address + 5 + size, 32) == boot_hasher.digest()
+    )
 
 
 def find_all_occurrences(data, pattern):
