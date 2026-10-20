@@ -22,6 +22,6 @@
 VERSION = "26.09.0"
 FORK_NAME = "Krux Bitcoin"
 CURRENCY_TICKER = "XBT"
-# No fork release signing key has been provisioned. Do not trust upstream
-# firmware updates that would silently restore standard-chain signing.
-SIGNER_PUBKEY = None
+# Paperclip Holdings LLC dedicated firmware key. Public provenance: keys/.
+# This is intentionally separate from upstream Krux and transaction keys.
+SIGNER_PUBKEY = "020b55a9b4127a37b888d22e09fabdaddf18e5ed2f951ebc4ef3a467e43faf6cd0"

@@ -2,7 +2,16 @@
 
 An unofficial fork of [Krux](https://github.com/selfcustody/krux) for Bitcoin (XBT), targeting the BLAKE2b proof-of-work rules implemented by Bitcoin Knots. **Transaction signing requires the new unified signature hash: `SIGHASH_UNIFIED | SIGHASH_ALL`, byte `0x21`.** There is no standard-chain signing switch or automatic downgrade.
 
-**Experimental source implementation.** Signing has been tested against a disposable Knots regtest node. A Yahboom K210 has passed USB installation and serial startup checks. Touchscreen operation, QR scanning, seed persistence, hardware transaction signing, production use and R36S/R36XS compatibility remain unverified.
+## Start here
+
+- **Install or update:** [Step-by-step instructions](docs/FIRMWARE-UPDATES.md).
+- **Check a download:** [Paperclip's public firmware key](keys/paperclip-firmware-signing-key.pem).
+- **Build it yourself:** [Reproduce the firmware](docs/REPRODUCIBLE-BUILD.md).
+- **Prepare transactions:** [Shrike](https://shrikewallet.com/) is a companion desktop wallet for offline signing with Krux.
+
+The signed-update changes are a release candidate. Existing releases through
+`v26.09.0-xbt.1` still require USB flashing. Copying a new public key onto an SD
+card does not change their installed firmware.
 
 ## Upstream update
 
@@ -16,7 +25,7 @@ Merged Krux v26.09.0, including the MaixPy AES-GCM tag-buffer fix, mnemonic reco
 - Rejects existing standard signatures and finalized inputs. Multisig coordinators must exchange unfinalized PSBTs and use unified ALL for every signer.
 - Adds conservative checks for reduced-data (RDTS) rules: output-script size, script push size, taproot control blocks, tapscript conditionals and oversized unsigned transactions. Corrects the Taproot key-path fee estimate for its explicit sighash byte.
 - Disables arbitrary/raw-hash message signing, which could bypass the transaction policy. Bitcoin-prefixed address-message proofs remain available; those proofs are not chain-specific.
-- Identifies the fork at startup. **SD firmware updates are disabled** until a fork release-signing key is provisioned. Upstream's key is not trusted to replace this fork. Development builds require manual flashing.
+- Identifies the fork at startup. SD updates are verified on the device using the dedicated Paperclip Holdings firmware key, then checked by reading back flash before activation. Upstream Krux keys are not accepted.
 
 BLAKE2b is the chain's proof-of-work algorithm. The unified signature digest itself uses the specified `UnifiedSighash` tagged SHA-256 hash. Transaction IDs, BIP39/BIP32 derivation and address checksums retain their specified algorithms. Read the [chain differences](docs/BLAKE2B.md).
 
@@ -32,7 +41,7 @@ An offline signer cannot prove which chain supplied an address or PSBT. Replay p
 ## Requirements
 
 - Host development: Python 3.11/3.12. Linux is recommended for the native BC-UR module and firmware toolchain. The small cryptographic policy suite also runs on Windows.
-- Hardware targets: upstream Krux's K210 devices with camera, screen and controls. Yahboom USB installation and startup have been checked; full hardware functional testing remains pending. **R36S/R36XS support is deferred.**
+- Hardware target for the reproducible build: Yahboom K210 (`maixpy_yahboom`). R36S/R36XS is not supported.
 - Consensus reference: Bitcoin Knots `v29.4.2.knots20260508`, commit `58398baf33e588779685ead478e6397bb28ed3d6`.
 - Legacy inputs retain Krux's verified previous-transaction requirement. Standard-chain PSBTs require deliberate preparation by a fork-aware coordinator; the signer does not silently convert them.
 
@@ -45,7 +54,7 @@ git clone --recursive https://github.com/connorslab/krux-blake2b.git
 cd krux-blake2b
 python -m venv .venv
 . .venv/bin/activate
-python -m pip install -e vendor/embit ./firmware/MaixPy/components/micropython/port/src/bc-ur pytest pytest-mock pycryptodome pyqrcode
+python -m pip install -e vendor/embit ./firmware/MaixPy/components/micropython/port/src/bc-ur pytest pytest-mock pycryptodome pyqrcode cryptography
 python -m pytest -q tests fork_tests vendor/embit/tests/tests/test_unified_sighash.py vendor/embit/tests/tests/test_unified_sighash_negotiation.py
 PYTHONPATH=src python fork_tests/regtest.py /path/to/bitcoind
 ```

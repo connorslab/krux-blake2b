@@ -26,6 +26,9 @@ def tdata(mocker):
     )
     TEST_SIGNER_PUBLIC_KEY = ec.PublicKey.from_string(TEST_SIGNER_PUBKEY)
     mocker.patch("krux.firmware.SIGNER_PUBKEY", TEST_SIGNER_PUBKEY)
+    # Legacy upgrade tests mock write_data rather than emulate flash writes.
+    # Real flash read-back and activation refusal are covered separately below.
+    mocker.patch("krux.firmware.verify_written_firmware", return_value=True)
 
     FILES_FOLDER = "files"
 
@@ -13961,7 +13964,7 @@ def test_upgrade_fail_not_this_device_exception(
 def test_fork_updates_disabled_without_provisioned_key(mocker, m5stickv):
     from krux import firmware
 
-    assert firmware.SIGNER_PUBKEY is None
+    mocker.patch("krux.firmware.SIGNER_PUBKEY", None)
     write = mocker.spy(firmware, "write_data")
     assert firmware.upgrade() is False
     write.assert_not_called()

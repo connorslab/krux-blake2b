@@ -28,6 +28,11 @@
 ############
 FROM gcc:12-bookworm@sha256:112aacdc53e949b9d2ccefb9ed64930a7fda5e10e007430f244be27e0263220b AS build-base
 
+# Freeze package resolution as well as the base image.
+RUN rm -f /etc/apt/sources.list.d/* && \
+    printf 'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/20261001T000000Z bookworm main\n' > /etc/apt/sources.list && \
+    printf 'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian-security/20261001T000000Z bookworm-security main\n' >> /etc/apt/sources.list
+
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y -q \
         wget \
@@ -60,7 +65,8 @@ RUN apt-get update -y && \
 
 RUN mkdir -p /opt && \
     GIT_TERMINAL_PROMPT=0 \
-    git clone --depth 1 --branch v8.2.0-20190409 https://github.com/kendryte/kendryte-gnu-toolchain
+    git clone --depth 1 --branch v8.2.0-20190409 https://github.com/kendryte/kendryte-gnu-toolchain && \
+    test "$(git -C kendryte-gnu-toolchain rev-parse HEAD)" = 5094cf28574abd107e4e925f102fe30a73607c08
 
 RUN cd kendryte-gnu-toolchain && \
     sed -i 's|https://github.com/bminor/binutils-gdb.git|https://github.com/riscvarchive/riscv-binutils-gdb.git|' .gitmodules && \
@@ -82,8 +88,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.0/cmake-3.21.0
 
 RUN apt-get update && apt-get install python3-venv -y
 RUN python3 -m venv /kruxenv
-RUN /kruxenv/bin/pip install astor
-RUN /kruxenv/bin/pip install pyserial==3.4
+RUN /kruxenv/bin/pip install astor==0.8.1 pyserial==3.4 setuptools==75.8.0 wheel==0.45.1
 
 
 ############
@@ -93,6 +98,8 @@ RUN /kruxenv/bin/pip install pyserial==3.4
 ############
 FROM build-base AS build-software
 ARG DEVICE="maixpy_m5stickv"
+ARG SOURCE_DATE_EPOCH=1792454400
+ENV SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH} TZ=UTC LC_ALL=C PYTHONHASHSEED=0
 ENV DEVICE_BUILTIN="firmware/MaixPy/projects/${DEVICE}/builtin_py"
 RUN mkdir /src
 WORKDIR /src
@@ -101,7 +108,7 @@ WORKDIR /src
 COPY ./vendor vendor
 
 # install vendor/embit
-RUN /kruxenv/bin/pip install vendor/embit
+RUN /kruxenv/bin/pip install --no-build-isolation --no-deps vendor/embit
 # clean vendor/embit
 RUN rm -rf vendor/embit/src/embit/util/prebuilt && \
     rm -rf vendor/embit/src/embit/liquid && \
@@ -115,6 +122,8 @@ RUN rm -rf vendor/embit/src/embit/util/prebuilt && \
 
 # copy firmware to WORKDIR (src)
 COPY ./firmware firmware
+COPY ./scripts/deterministic-build-inputs.py /tmp/deterministic-build-inputs.py
+RUN /kruxenv/bin/python /tmp/deterministic-build-inputs.py
 # clean firmware
 RUN find firmware -type d -name '__pycache__' -exec rm -rv {} + -depth
 
@@ -129,6 +138,7 @@ RUN mv src/boot.py src/_boot.py
 RUN find src -type d -name '__pycache__' -exec rm -rv {} + -depth
 # copy it to DEVICE_BUILTIN
 RUN cp -r src/. "${DEVICE_BUILTIN}"
+RUN find /src -type f -exec touch -d "@${SOURCE_DATE_EPOCH}" {} +
 
 
 ############

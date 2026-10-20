@@ -184,6 +184,23 @@ def sha256(firmware_filename, firmware_size=None):
     return hasher.digest()
 
 
+def verify_written_firmware(address, size, expected_hash):
+    """Check actual flash bytes against the signed digest before activation."""
+    if flash.read(address, 5) != b"\x00" + size.to_bytes(4, "little"):
+        return False
+    hasher = uhashlib_hw.sha256()
+    offset = 0
+    while offset < size:
+        wdt.feed()
+        count = min(READ_FIRMWARE_BUFFER, size - offset)
+        chunk = flash.read(address + 5 + offset, count)
+        if len(chunk) != count:
+            return False
+        hasher.update(chunk)
+        offset += count
+    return hasher.digest() == expected_hash
+
+
 def find_all_occurrences(data, pattern):
     """Find all occurrences of the pattern in the data"""
     positions = []
@@ -322,7 +339,7 @@ def upgrade():
 
     # Validate firmware file size
     new_size = fsize(firmware_path)
-    if new_size > MAX_FIRMWARE_SIZE:
+    if new_size <= 0 or new_size > MAX_FIRMWARE_SIZE:
         display.flash_text(
             "Firmware exceeds max size: %d" % MAX_FIRMWARE_SIZE, theme.error_color
         )
@@ -332,7 +349,7 @@ def upgrade():
     sig = None
     try:
         with open(firmware_path + ".sig", "rb") as sig_file:
-            sig = sig_file.read()
+            sig = sig_file.read(73)
     except:
         display.flash_text(t("Missing signature file"), theme.error_color)
         return False
@@ -341,7 +358,10 @@ def upgrade():
     firmware_hash = sha256(firmware_path)
     try:
         # Parse, serialize, and reparse to ensure signature is compact prior to verification
-        sig = ec.Signature.parse(ec.Signature.parse(sig).serialize())
+        parsed_sig = ec.Signature.parse(sig)
+        if parsed_sig.serialize() != sig:
+            raise ValueError("Non-canonical signature")
+        sig = ec.Signature.parse(parsed_sig.serialize())
         if not pubkey.verify(sig, firmware_hash):
             display.flash_text(t("Bad signature"), theme.error_color)
             return False
@@ -400,6 +420,9 @@ def upgrade():
                 True,
                 firmware_with_header_hash,
             )
+
+        if not verify_written_firmware(new_address, new_size, firmware_hash):
+            raise ValueError("Written firmware does not match signed firmware")
 
         write_data(
             lambda pct: status_text(

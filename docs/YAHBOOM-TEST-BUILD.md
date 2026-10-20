@@ -3,10 +3,8 @@
 Target: Yahboom K210 Vision Sensor / Vision Recognition Module with the
 2-inch touchscreen (`maixpy_yahboom`). This is not a K230 image.
 
-This is experimental firmware. USB installation and serial startup have been
-checked on a physical Yahboom K210. Touchscreen navigation, camera QR scanning,
-seed persistence and transaction signing still require functional checks. Use
-a disposable test seed and unfunded wallet for those checks.
+For current instructions, see [Install and update](FIRMWARE-UPDATES.md).
+The build records below describe older USB-only releases.
 
 ## Verified build output
 
@@ -57,19 +55,6 @@ dependencies are pinned as Git submodules.
 The fork has no provisioned firmware signing key. SD firmware upgrades are
 deliberately disabled; use USB flashing for this test build. Never select an
 upstream automatic installer that replaces this image with standard Krux.
-
-## Arrival checks
-
-- Record the PCB revision and test the touchscreen and buttons.
-- Scan QR codes from a disposable wallet, including animated transaction QR.
-- Create an encrypted test-seed backup on a compatible microSD card, restart,
-  and verify recovery with the correct password and refusal with a wrong one.
-- Sign a Bitcoin test transaction using explicit unified SIGHASH_ALL `0x21`.
-- Verify the signature with a compatible node, and verify that a PSBT with
-  missing or legacy sighash values is refused.
-
-See [chain rules](BLAKE2B.md) and [software validation](BLAKE2B-VALIDATION.md)
-for the scope and limitations of the existing tests.
 
 ## Bitcoin/XBT build installed on 2026-10-06
 

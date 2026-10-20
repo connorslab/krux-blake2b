@@ -1,0 +1,20 @@
+name: Reproduce signed-update firmware
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reproduce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: docker/setup-buildx-action@v3
+      - name: Build twice and compare
+        run: bash scripts/reproduce.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reproducible-yahboom
+          path: build/reproduction/

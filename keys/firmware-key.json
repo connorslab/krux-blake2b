@@ -1,0 +1,7 @@
+{
+  "identity": "Paperclip Holdings LLC (Krux Firmware Signing)",
+  "purpose": "Krux firmware.bin updates only; not transaction signing",
+  "algorithm": "ECDSA secp256k1 over SHA256(firmware.bin), DER low-S",
+  "compressed_public_key": "020b55a9b4127a37b888d22e09fabdaddf18e5ed2f951ebc4ef3a467e43faf6cd0",
+  "release_identity_fingerprint": "AC121D21CE3BB408763DD608165128AF9E2F3216"
+}
