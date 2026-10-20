@@ -55,6 +55,5 @@ stage was shared. The exact source commit is
 | `firmware.bin` | `bd8f51115083931b05b8291351479799450b9dce9259e2501816b63ce34f36b7` |
 | `kboot.kfpkg` | `75d26b082fd25cdfb7cbdcb0b8ace769a68dec2fd5aaa22e34972f8d5b8b9656` |
 
-The separately packaged Windows flasher is not covered by this firmware
-reproducibility result. Documentation updates on the main branch do not change
+Documentation updates on the main branch do not change
 the release's source commit; always check out the commit named above.

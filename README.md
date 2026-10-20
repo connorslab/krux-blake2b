@@ -8,7 +8,7 @@ An offline Bitcoin Blake2b (XBT) transaction signer, based on [Krux](https://git
 
 | Download or guide | Use |
 | --- | --- |
-| [Windows portable flasher 0.3.0](https://github.com/connorslab/krux-blake2b/releases/download/v26.09.0-xbt.2/PaperclipKrux-Windows-x64-portable-0.3.0.zip) | Extract the ZIP and run the included flasher; matching firmware is bundled. |
+| [USB flashing instructions](docs/FIRMWARE-UPDATES.md#first-installation-windows-macos-or-linux) | Install the complete firmware package using Python on Windows, macOS or Linux. |
 | [Release files](https://github.com/connorslab/krux-blake2b/releases/tag/v26.09.0-xbt.2) | Firmware, USB package, signatures and checksums. |
 | [Installation and updates](docs/FIRMWARE-UPDATES.md) | USB installation and future signed SD updates. |
 | [Reproduce the build](docs/REPRODUCIBLE-BUILD.md) | Build and compare the exact released firmware. |
@@ -27,7 +27,6 @@ companion wallet for preparing transactions and broadcasting after signing.
 - [Regression tests](https://github.com/connorslab/krux-blake2b/actions/runs/39449586428): **1,220 passed**, plus the Knots regtest covering eight script forms.
 - [Reproducibility check](https://github.com/connorslab/krux-blake2b/actions/runs/39449585269): two clean firmware build stages produced identical firmware and USB packages, using a shared pinned compiler stage.
 - The released firmware signature passed verification with the device's signature library.
-- The Windows flasher passed six automated tests, packaged integrity and launch checks, and a GUI smoke check.
 
 ## Firmware updates: verified by the signer
 
@@ -82,7 +81,6 @@ No output and exit status zero means the files are identical. See the
 The [successful build comparison](https://github.com/connorslab/krux-blake2b/actions/runs/39449585269)
 produced firmware SHA-256
 `bd8f51115083931b05b8291351479799450b9dce9259e2501816b63ce34f36b7`.
-The Windows flasher executable is not covered by the firmware reproducibility claim.
 
 ## Compatibility changes
 
