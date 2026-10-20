@@ -1,18 +1,33 @@
-# Krux Bitcoin (XBT)
+# Paperclip Krux
 
-An unofficial fork of [Krux](https://github.com/selfcustody/krux) for Bitcoin (XBT), targeting the BLAKE2b proof-of-work rules implemented by Bitcoin Knots. **Transaction signing requires the new unified signature hash: `SIGHASH_UNIFIED | SIGHASH_ALL`, byte `0x21`.** There is no standard-chain signing switch or automatic downgrade.
+An offline Bitcoin Blake2b (XBT) transaction signer, based on [Krux](https://github.com/selfcustody/krux). Prepare transactions in a compatible wallet, review and sign them on the device, then return the signed transaction by QR code or microSD.
 
-## Start here
+## Current release
 
-- **Install or update:** [Step-by-step instructions](docs/FIRMWARE-UPDATES.md).
-- **Check a download:** [Paperclip's public firmware key](keys/paperclip-firmware-signing-key.pem).
-- **Build it yourself:** [Reproduce the firmware](docs/REPRODUCIBLE-BUILD.md).
-- **Prepare transactions:** [Shrike](https://shrikewallet.com/) is a companion desktop wallet for offline signing with Krux.
+**[v26.09.0-xbt.2](https://github.com/connorslab/krux-blake2b/releases/tag/v26.09.0-xbt.2)** is published as a prerelease for the **Yahboom K210** (`maixpy_yahboom`), based on Krux v26.09.0.
 
-**Latest firmware: [v26.09.0-xbt.2](https://github.com/connorslab/krux-blake2b/releases/tag/v26.09.0-xbt.2).**
-This release includes the Paperclip firmware trust key and passed the clean-build
-comparison. Existing releases through `v26.09.0-xbt.1` need one USB installation
-of this release to enable future signed SD updates.
+| Download or guide | Use |
+| --- | --- |
+| [Windows portable flasher 0.3.0](https://github.com/connorslab/krux-blake2b/releases/download/v26.09.0-xbt.2/PaperclipKrux-Windows-x64-portable-0.3.0.zip) | Extract the ZIP and run the included flasher; matching firmware is bundled. |
+| [Release files](https://github.com/connorslab/krux-blake2b/releases/tag/v26.09.0-xbt.2) | Firmware, USB package, signatures and checksums. |
+| [Installation and updates](docs/FIRMWARE-UPDATES.md) | USB installation and future signed SD updates. |
+| [Reproduce the build](docs/REPRODUCIBLE-BUILD.md) | Build and compare the exact released firmware. |
+| [Signing keys](keys/README.md) | Public firmware key and authenticated release-key provenance. |
+
+**Already running an older release?** Releases through `v26.09.0-xbt.1`
+need one USB installation of this build to enable future signed SD updates.
+The on-device version is `26.09.0`; subsequent SD updates must have a newer
+on-device version. Changing only the GitHub release suffix is not sufficient.
+
+[Shrike by privkeyio](https://github.com/privkeyio/shrike) is a compatible
+companion wallet for preparing transactions and broadcasting after signing.
+
+## Release verification
+
+- [Regression tests](https://github.com/connorslab/krux-blake2b/actions/runs/39449586428): **1,220 passed**, plus the Knots regtest covering eight script forms.
+- [Reproducibility check](https://github.com/connorslab/krux-blake2b/actions/runs/39449585269): two clean firmware build stages produced identical firmware and USB packages, using a shared pinned compiler stage.
+- The released firmware signature passed verification with the device's signature library.
+- The Windows flasher passed six automated tests, packaged integrity and launch checks, and a GUI smoke check.
 
 ## Firmware updates: verified by the signer
 
@@ -69,11 +84,10 @@ produced firmware SHA-256
 `bd8f51115083931b05b8291351479799450b9dce9259e2501816b63ce34f36b7`.
 The Windows flasher executable is not covered by the firmware reproducibility claim.
 
-## Upstream update
-
-Merged Krux v26.09.0, including the MaixPy AES-GCM tag-buffer fix, mnemonic recovery and cancellation fixes, numeric editor guidance, and the versioned startup disclaimer. The pinned privkeyio/embit already includes upstream Embit v0.8.2 PSBT hardening; its unified-signature additions are retained. Existing KEF envelopes remain compatible.
-
 ## Compatibility changes
+
+Transaction signing requires `SIGHASH_UNIFIED | SIGHASH_ALL`, byte `0x21`.
+There is no standard-chain signing switch or automatic downgrade.
 
 - Pins [privkeyio/embit](https://github.com/privkeyio/embit) at `087d020fbfb66fc2e0eab88fb948269e1da28e95`, including unified hashing and PSBT negotiation. Tests and firmware builds use this same submodule pin.
 - Requires every input to explicitly request **unified ALL (`0x21`)**. Missing/default, standard ALL, NONE, SINGLE, ANYONECANPAY and unknown modes fail before any signatures are produced.
