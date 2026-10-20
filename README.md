@@ -13,6 +13,59 @@ The signed-update changes are a release candidate. Existing releases through
 `v26.09.0-xbt.1` still require USB flashing. Copying a new public key onto an SD
 card does not change their installed firmware.
 
+## Firmware updates: verified by the signer
+
+The installed Paperclip firmware contains the **Paperclip Holdings LLC firmware
+public key**. It verifies the vendor signature on a new firmware image itself,
+before activating that image. You do not have to trust your computer to make
+that decision.
+
+For an SD update, put the newer release's `firmware.bin` and `firmware.bin.sig`
+in the root of the microSD card, insert it, and restart the signer. The signer
+checks the signature, device model and version, then asks you to approve the
+update on its screen. It writes the inactive firmware slot and checks the
+written bytes and boot checksum before activating it.
+
+Older firmware with SD updates disabled needs **one USB installation** of the
+signed-update firmware. Subsequent updates can use this on-device verification
+path. This is signed-update verification, not hardware-enforced secure boot:
+USB flashing can replace the firmware and its embedded key.
+
+See [installation and update instructions](docs/FIRMWARE-UPDATES.md).
+The [public key and its authenticated provenance](keys/README.md) are in this
+repository. The private signing key is not.
+
+## Build the exact firmware binary yourself
+
+You can build `firmware.bin` without the vendor's private signing key. The
+signature is a separate file, so it does not change the firmware you reproduce.
+
+On Linux or WSL2, with Git and Docker Buildx installed:
+
+```sh
+git clone https://github.com/connorslab/krux-blake2b.git
+cd krux-blake2b
+git checkout --detach RELEASE_COMMIT
+git submodule update --init --recursive
+bash scripts/reproduce.sh
+```
+
+Replace `RELEASE_COMMIT` with the full source commit published with the release.
+The script rebuilds the firmware twice and requires both `firmware.bin` and
+`kboot.kfpkg` to match byte for byte. It fixes the build timestamp and uses
+pinned build dependencies.
+
+Then compare your result with the actual downloaded firmware:
+
+```sh
+cmp build/reproduction/RELEASE_COMMIT/1/firmware.bin /path/to/downloaded/firmware.bin
+```
+
+No output and exit status zero means the files are identical. See the
+[build guide](docs/REPRODUCIBLE-BUILD.md) for output files and build status.
+The candidate's first successful build comparison is still pending; the
+existing downloadable release is not being relabeled as reproducible.
+
 ## Upstream update
 
 Merged Krux v26.09.0, including the MaixPy AES-GCM tag-buffer fix, mnemonic recovery and cancellation fixes, numeric editor guidance, and the versioned startup disclaimer. The pinned privkeyio/embit already includes upstream Embit v0.8.2 PSBT hardening; its unified-signature additions are retained. Existing KEF envelopes remain compatible.
