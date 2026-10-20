@@ -41,7 +41,7 @@ An offline signer cannot prove which chain supplied an address or PSBT. Replay p
 ## Requirements
 
 - Host development: Python 3.11/3.12. Linux is recommended for the native BC-UR module and firmware toolchain. The small cryptographic policy suite also runs on Windows.
-- Hardware target for the reproducible build: Yahboom K210 (`maixpy_yahboom`). R36S/R36XS is not supported.
+- Hardware target for the reproducible build: Yahboom K210 (`maixpy_yahboom`).
 - Consensus reference: Bitcoin Knots `v29.4.2.knots20260508`, commit `58398baf33e588779685ead478e6397bb28ed3d6`.
 - Legacy inputs retain Krux's verified previous-transaction requirement. Standard-chain PSBTs require deliberate preparation by a fork-aware coordinator; the signer does not silently convert them.
 

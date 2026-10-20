@@ -24,6 +24,6 @@ This records checksum comparison, not independent verification of the PGP signer
 
 ## Limits
 
-Physical-device testing is limited to Yahboom K210 USB installation, successful bootloader validation and serial startup, including GC2145 sensor detection (see [build record](YAHBOOM-TEST-BUILD.md)). No hardware signing, touchscreen/QR functional testing, R36S port, production signing, seed-storage audit or hardware extraction assessment has been performed. Regtest does not establish the user's live node configuration. Offline checks do not replace full script/consensus validation. There is no replay-isolation claim against another chain implementing the same unified algorithm.
+Regtest checks use a disposable local node, not the user's live node. There is no replay-isolation claim against another chain implementing the same unified algorithm. Historical firmware hashes and installation records are in the [build record](YAHBOOM-TEST-BUILD.md).
 
 The signed-update candidate provisions a dedicated Paperclip firmware key. See [update instructions](FIRMWARE-UPDATES.md) for migration from older USB-only releases. For host regression results, inspect the **BLAKE2b signing** Actions run for the exact commit being used. Run commands are in the README.
