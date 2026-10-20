@@ -14,12 +14,12 @@ The first run builds a compiler and can take over an hour.
 
 ## Run the build
 
-Replace `RELEASE_COMMIT` with the full commit from the release:
+For release `v26.09.0-xbt.2`, use this exact source commit:
 
 ```sh
 git clone https://github.com/connorslab/krux-blake2b.git
 cd krux-blake2b
-git checkout --detach RELEASE_COMMIT
+git checkout --detach fd75a549d3f0ff3d87e6f57c0ffece8420a748ab
 git submodule update --init --recursive
 bash scripts/reproduce.sh
 ```
@@ -44,6 +44,17 @@ reproducible firmware binary.
 
 ## Build status
 
-The new signed-update build procedure is undergoing its first comparison.
-Until a successful run and matching release checksums are published, there is
-no claim that this candidate has passed the reproducibility check.
+Release `v26.09.0-xbt.2` passed the
+[two-build comparison](https://github.com/connorslab/krux-blake2b/actions/runs/39449585269).
+Both firmware stages were rebuilt without cached firmware output; the compiler
+stage was shared. The exact source commit is
+`fd75a549d3f0ff3d87e6f57c0ffece8420a748ab`.
+
+| File | SHA-256 |
+| --- | --- |
+| `firmware.bin` | `bd8f51115083931b05b8291351479799450b9dce9259e2501816b63ce34f36b7` |
+| `kboot.kfpkg` | `75d26b082fd25cdfb7cbdcb0b8ace769a68dec2fd5aaa22e34972f8d5b8b9656` |
+
+The separately packaged Windows flasher is not covered by this firmware
+reproducibility result. Documentation updates on the main branch do not change
+the release's source commit; always check out the commit named above.

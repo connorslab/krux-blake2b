@@ -2,6 +2,9 @@
 
 ## Which files do I need?
 
+Download [v26.09.0-xbt.2](https://github.com/connorslab/krux-blake2b/releases/tag/v26.09.0-xbt.2).
+For Windows USB installation, the portable ZIP includes the flasher and firmware.
+
 Choose the release for your device. For the Paperclip Yahboom K210, use
 `maixpy_yahboom`.
 
@@ -33,6 +36,11 @@ Once signed-update firmware is installed:
 4. The signer checks the signature, device type and firmware version.
 5. Review the version on its screen and approve installation.
 6. Restart when installation has finished.
+
+This release establishes that update path. It cannot update an older USB-only
+release through SD, and reinstalling the same version through SD is refused.
+The device's version remains `26.09.0`; a subsequent SD update must carry a
+newer on-device version, not just a different GitHub release suffix.
 
 **The installed firmware verifies the signature itself.** The computer only
 downloads and copies files. A checksum file or a successful PC verification

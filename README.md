@@ -9,9 +9,10 @@ An unofficial fork of [Krux](https://github.com/selfcustody/krux) for Bitcoin (X
 - **Build it yourself:** [Reproduce the firmware](docs/REPRODUCIBLE-BUILD.md).
 - **Prepare transactions:** [Shrike](https://shrikewallet.com/) is a companion desktop wallet for offline signing with Krux.
 
-The signed-update changes are a release candidate. Existing releases through
-`v26.09.0-xbt.1` still require USB flashing. Copying a new public key onto an SD
-card does not change their installed firmware.
+**Latest firmware: [v26.09.0-xbt.2](https://github.com/connorslab/krux-blake2b/releases/tag/v26.09.0-xbt.2).**
+This release includes the Paperclip firmware trust key and passed the clean-build
+comparison. Existing releases through `v26.09.0-xbt.1` need one USB installation
+of this release to enable future signed SD updates.
 
 ## Firmware updates: verified by the signer
 
@@ -45,12 +46,12 @@ On Linux or WSL2, with Git and Docker Buildx installed:
 ```sh
 git clone https://github.com/connorslab/krux-blake2b.git
 cd krux-blake2b
-git checkout --detach RELEASE_COMMIT
+git checkout --detach fd75a549d3f0ff3d87e6f57c0ffece8420a748ab
 git submodule update --init --recursive
 bash scripts/reproduce.sh
 ```
 
-Replace `RELEASE_COMMIT` with the full source commit published with the release.
+These commands reproduce `v26.09.0-xbt.2` from its exact release source commit.
 The script rebuilds the firmware twice and requires both `firmware.bin` and
 `kboot.kfpkg` to match byte for byte. It fixes the build timestamp and uses
 pinned build dependencies.
@@ -58,13 +59,15 @@ pinned build dependencies.
 Then compare your result with the actual downloaded firmware:
 
 ```sh
-cmp build/reproduction/RELEASE_COMMIT/1/firmware.bin /path/to/downloaded/firmware.bin
+cmp build/reproduction/fd75a549d3f0ff3d87e6f57c0ffece8420a748ab/1/firmware.bin /path/to/downloaded/firmware.bin
 ```
 
 No output and exit status zero means the files are identical. See the
 [build guide](docs/REPRODUCIBLE-BUILD.md) for output files and build status.
-The candidate's first successful build comparison is still pending; the
-existing downloadable release is not being relabeled as reproducible.
+The [successful build comparison](https://github.com/connorslab/krux-blake2b/actions/runs/39449585269)
+produced firmware SHA-256
+`bd8f51115083931b05b8291351479799450b9dce9259e2501816b63ce34f36b7`.
+The Windows flasher executable is not covered by the firmware reproducibility claim.
 
 ## Upstream update
 
